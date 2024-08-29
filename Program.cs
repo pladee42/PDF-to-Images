@@ -18,15 +18,15 @@ class Program
         // Read settings from configuration
         string pdfFilePath = @"input/BZB_24060712.pdf";
         string outputDirectory = @"output";
-        string connectionString = configuration.GetConnectionString("AzureBlobStorage");
-        string containerName = configuration["BlobContainerName"];
+        string connectionString = configuration.GetConnectionString("AzureBlobStorage")!;
+        string containerName = configuration["BlobContainerName"]!;
 
         // Input the range of pages
         Console.WriteLine("Enter the start page (leave blank to process all pages):");
-        string startPageInput = Console.ReadLine();
+        string startPageInput = Console.ReadLine()!;
 
         Console.WriteLine("Enter the end page (leave blank to process all pages):");
-        string endPageInput = Console.ReadLine();
+        string endPageInput = Console.ReadLine()!;
 
         int? startPage = string.IsNullOrWhiteSpace(startPageInput) ? (int?)null : int.Parse(startPageInput);
         int? endPage = string.IsNullOrWhiteSpace(endPageInput) ? (int?)null : int.Parse(endPageInput);
