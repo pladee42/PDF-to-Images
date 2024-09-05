@@ -4,46 +4,45 @@ using System.IO;
 
 public class PdfToImages
 {
-    public void ConvertPdfToImages(string pdfFilePath, string outputDirectory, int? startPage = null, int? endPage = null)
+    // Method to convert PDF from byte array to images
+    public void ConvertPdfBytesToImages(byte[] pdfBytes, string outputDirectory, string fileName, int? startPage = null, int? endPage = null)
     {
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDirectory);
 
         // Extract the file name without extension
-        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(pdfFilePath);
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
-        // Load the PDF file
-        using (var images = new MagickImageCollection())
+        // Load the PDF from the byte array
+        using (var stream = new MemoryStream(pdfBytes))
         {
-            images.Read(pdfFilePath);
-
-            // If startPage or endPage is not provided, set them to cover all pages
-            startPage ??= 1;
-            endPage ??= images.Count;
-
-            // Validate page range
-            if (startPage < 1 || endPage > images.Count || startPage > endPage)
+            using (var images = new MagickImageCollection())
             {
-                throw new ArgumentOutOfRangeException("Invalid page range specified.");
-            }
+                // Check if specific pages need to be read
+                if (startPage.HasValue && endPage.HasValue)
+                {
+                    // Configure settings to read a specific range of pages
+                    var settings = new MagickReadSettings
+                    {
+                        FrameIndex = startPage.Value - 1, // Convert to zero-based index
+                        FrameCount = endPage.Value - startPage.Value + 1
+                    };
+                    images.Read(stream, settings);
+                }
+                else
+                {
+                    // Read the entire document without restricting pages
+                    images.Read(stream);
+                }
 
-            for (int i = startPage.Value; i <= endPage.Value; i++)
-            {
-                var image = images[i - 1];  // Pages are 0-indexed in MagickImageCollection
-
-                // Set the output format (e.g., png, jpg, etc.)
-                image.Format = MagickFormat.Png;
-
-                // Create the output file path with the format {InputFileName}-Page-{pagenumber}
-                string outputFilePath = Path.Combine(outputDirectory, $"{fileNameWithoutExtension}-Page-{i}.png");
-
-                // Save the image
-                image.Write(outputFilePath);
-
-                Console.WriteLine($"Page {i} converted to image: {outputFilePath}");
+                // Save each page as an image with the specified naming format
+                for (int i = 0; i < images.Count; i++)
+                {
+                    string imageFileName = $"{fileNameWithoutExtension}-Page-{i + 1}.png";
+                    images[i].Write(Path.Combine(outputDirectory, imageFileName));
+                    Console.WriteLine($"Saved {imageFileName}");
+                }
             }
         }
-
-        Console.WriteLine("Specified PDF pages converted to images successfully!");
     }
 }

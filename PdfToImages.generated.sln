@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfToImages", "PdfToImages.csproj", "{9D945E8F-FD30-4C45-93D5-EEE6687C798B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfToImages", "PdfToImages.csproj", "{5AA969D0-7CD6-415A-A01D-2CB4FB4E46A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9D945E8F-FD30-4C45-93D5-EEE6687C798B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D945E8F-FD30-4C45-93D5-EEE6687C798B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D945E8F-FD30-4C45-93D5-EEE6687C798B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D945E8F-FD30-4C45-93D5-EEE6687C798B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AA969D0-7CD6-415A-A01D-2CB4FB4E46A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AA969D0-7CD6-415A-A01D-2CB4FB4E46A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AA969D0-7CD6-415A-A01D-2CB4FB4E46A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AA969D0-7CD6-415A-A01D-2CB4FB4E46A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

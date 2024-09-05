@@ -62,3 +62,4 @@
 /Users/tan_waris/Library/CloudStorage/OneDrive-Personal/Projects/PdfToImages/obj/Debug/net8.0/PdfToImages.csproj.AssemblyReference.cache
 /Users/tan_waris/Library/CloudStorage/OneDrive-Personal/Projects/PdfToImages/obj/Debug/net8.0/PdfToIma.42C500B7.Up2Date
 /Users/tan_waris/Library/CloudStorage/OneDrive-Personal/Projects/PdfToImages/bin/Debug/net8.0/Ghostscript.NET.dll
+/Users/tan_waris/Library/CloudStorage/OneDrive-Personal/Projects/PdfToImages/obj/Debug/net8.0/PdfToImages.sourcelink.json

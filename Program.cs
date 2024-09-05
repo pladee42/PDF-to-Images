@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Threading.Tasks;
 
 class Program
 {
@@ -15,35 +16,67 @@ class Program
         var configuration = host.Services.GetRequiredService<IConfiguration>();
         var pdfToImages = new PdfToImages();
         
-        // Read settings from configuration
-        string pdfFilePath = @"input/BZB_24060712.pdf";
-        string outputDirectory = @"output";
+        // Get connection string and container name from configuration
         string connectionString = configuration.GetConnectionString("AzureBlobStorage")!;
         string containerName = configuration["BlobContainerName"]!;
+        string baseUrl = configuration["BlobUrl"]!;
+
+        // User inputs the name of the file to be downloaded
+        Console.WriteLine("Enter the name of the PDF file (e.g., BZB_24060712.pdf):");
+        string fileName = Console.ReadLine()!;
+        string fileUrl = $"{baseUrl}{fileName}";
 
         // Input the range of pages
         Console.WriteLine("Enter the start page (leave blank to process all pages):");
-        string startPageInput = Console.ReadLine()!;
+        string? startPageInput = Console.ReadLine();
 
         Console.WriteLine("Enter the end page (leave blank to process all pages):");
-        string endPageInput = Console.ReadLine()!;
+        string? endPageInput = Console.ReadLine();
 
-        int? startPage = string.IsNullOrWhiteSpace(startPageInput) ? (int?)null : int.Parse(startPageInput);
-        int? endPage = string.IsNullOrWhiteSpace(endPageInput) ? (int?)null : int.Parse(endPageInput);
+        // Convert page input to nullable integers
+        int? startPage = string.IsNullOrWhiteSpace(startPageInput) ? null : int.Parse(startPageInput);
+        int? endPage = string.IsNullOrWhiteSpace(endPageInput) ? null : int.Parse(endPageInput);
 
-        // Convert PDF to images
-        pdfToImages.ConvertPdfToImages(pdfFilePath, outputDirectory, startPage, endPage);
+        // Download the PDF file from Azure Blob URL
+        try
+        {
+            byte[] pdfBytes = await DownloadPdfFromBlob(fileUrl);
+            Console.WriteLine("PDF downloaded successfully.");
 
-        // Upload images to Azure Blob Storage
-        var azureBlob = new AzureBlob(connectionString, containerName);
-        await azureBlob.UploadImagesAsync(outputDirectory);
+            // Specify output directory for images
+            string outputDirectory = "output";
+
+            // Convert downloaded PDF bytes to images with the specified range
+            pdfToImages.ConvertPdfBytesToImages(pdfBytes, outputDirectory, fileName, startPage, endPage);
+
+            // Upload images to Azure Blob Storage
+            var azureBlob = new AzureBlob(connectionString, containerName);
+            await azureBlob.UploadImagesAsync(outputDirectory);
+
+            Console.WriteLine("Images uploaded to Azure Blob Storage successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 
+    // Method to download PDF as byte array from the given URL
+    static async Task<byte[]> DownloadPdfFromBlob(string url)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+    }
+
+    // Create and configure the host builder
     static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
             {
-                // Load the appsettings.json
                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             })
             .ConfigureServices((context, services) =>
